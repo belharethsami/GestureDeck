@@ -10,6 +10,7 @@ final class AppController: ObservableObject {
     let launcher: ApplicationLauncher
     let gestureService: GestureService
     let hotkeyService: HotkeyService
+    let launchAtLoginController: LaunchAtLoginController
     private var cancellables: Set<AnyCancellable> = []
     private var diagnosticsStarted = false
 
@@ -18,6 +19,7 @@ final class AppController: ObservableObject {
         launcher = ApplicationLauncher()
         gestureService = GestureService()
         hotkeyService = HotkeyService()
+        launchAtLoginController = LaunchAtLoginController()
 
         store.onChange = { [weak self] configuration in
             self?.apply(configuration)
@@ -102,6 +104,7 @@ final class AppController: ObservableObject {
             "hotkeyHandlerReady": hotkeyService.registrationError == nil,
             "lastAction": launcher.lastAction,
             "launchError": launcher.lastError ?? NSNull(),
+            "launchAtLogin": launchAtLoginController.state.rawValue,
             "multitouchListening": gestureService.isListening,
             "multitouchStatus": gestureService.status
         ]

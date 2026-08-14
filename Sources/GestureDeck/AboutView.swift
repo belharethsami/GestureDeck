@@ -4,6 +4,7 @@ struct AboutView: View {
     @ObservedObject var store: BindingStore
     @ObservedObject var launcher: ApplicationLauncher
     @ObservedObject var hotkeyService: HotkeyService
+    @ObservedObject var launchAtLoginController: LaunchAtLoginController
 
     var body: some View {
         ScrollView {
@@ -23,7 +24,7 @@ struct AboutView: View {
                             .font(.largeTitle.weight(.bold))
                         Text("Focused gesture and shortcut automation for macOS")
                             .foregroundStyle(.secondary)
-                        Text("Version 0.1.0 · MIT licensed")
+                        Text("Version 0.2.0 · MIT licensed")
                             .font(.caption)
                             .foregroundStyle(.tertiary)
                     }
@@ -47,6 +48,44 @@ struct AboutView: View {
                             Label(error, systemImage: "exclamationmark.triangle")
                                 .foregroundStyle(.red)
                                 .font(.caption)
+                        }
+                    }
+                    .padding(.vertical, 6)
+                }
+
+                GroupBox("Startup") {
+                    VStack(alignment: .leading, spacing: 10) {
+                        Toggle(
+                            "Start GestureDeck at Login",
+                            isOn: Binding(
+                                get: { launchAtLoginController.isRequested },
+                                set: { requested in
+                                    launchAtLoginController.setRequested(requested)
+                                }
+                            )
+                        )
+                        .disabled(
+                            launchAtLoginController.isUpdating
+                                || launchAtLoginController.state == .unavailable
+                        )
+                        .accessibilityIdentifier("startAtLoginToggle")
+
+                        Text(launchAtLoginController.statusDescription)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+
+                        if launchAtLoginController.state == .requiresApproval {
+                            Button("Open Login Items Settings…") {
+                                launchAtLoginController.openLoginItemSettings()
+                            }
+                            .controlSize(.small)
+                        }
+
+                        if let error = launchAtLoginController.errorMessage {
+                            Label(error, systemImage: "exclamationmark.triangle")
+                                .foregroundStyle(.red)
+                                .font(.caption)
+                                .fixedSize(horizontal: false, vertical: true)
                         }
                     }
                     .padding(.vertical, 6)

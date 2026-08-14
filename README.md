@@ -16,7 +16,12 @@ branding or code and is not affiliated with its developer.
 - Local JSON configuration in `UserDefaults`
 - Live finger-count and last-recognized-gesture diagnostics
 - Menu-bar enable/pause control
+- Optional start-at-login setting using macOS Service Management
 - No account, network client, analytics, or typed-text recording
+
+When macOS starts GestureDeck as a login item, it stays in the menu bar without
+opening its settings window. Use **Open GestureDeck…** from the menu-bar panel
+to configure bindings or the start-at-login option.
 
 ## Important platform limitation
 
@@ -83,9 +88,10 @@ make test
 ```
 
 The deterministic logic harness covers each supported finger count, all core
-recognition rules, contact-count transitions, and configuration persistence.
-Real trackpad hardware must still be exercised manually because synthetic input
-cannot reproduce Apple's private raw-contact callback.
+recognition rules, contact-count transitions, configuration persistence, and
+start-at-login state transitions. Real trackpad hardware must still be exercised
+manually because synthetic input cannot reproduce Apple's private raw-contact
+callback.
 
 ## License
 

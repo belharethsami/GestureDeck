@@ -38,6 +38,7 @@ enum GestureDeckLogicTests {
         testShortAndDiagonalMovements(runner)
         testFingerCountTransitions(runner)
         testConfigurationRoundTrip(runner)
+        testLaunchAtLoginStates(runner)
         runner.finish()
     }
 
@@ -96,6 +97,38 @@ enum GestureDeckLogicTests {
         let encoded = try! JSONEncoder().encode(original)
         let decoded = try! JSONDecoder().decode(GestureDeckConfiguration.self, from: encoded)
         runner.expect(decoded == original, "Configuration must round-trip through JSON")
+    }
+
+    @MainActor
+    private static func testLaunchAtLoginStates(_ runner: TestRunner) {
+        runner.expect(!LaunchAtLoginState.disabled.isRequested, "Disabled login items must appear off")
+        runner.expect(LaunchAtLoginState.enabled.isRequested, "Enabled login items must appear on")
+        runner.expect(LaunchAtLoginState.enabled.isEffective, "Enabled login items must be effective")
+        runner.expect(
+            LaunchAtLoginState.requiresApproval.isRequested,
+            "Registered login items awaiting approval must remain requested"
+        )
+        runner.expect(
+            !LaunchAtLoginState.requiresApproval.isEffective,
+            "Login items awaiting approval must not be reported as effective"
+        )
+        runner.expect(!LaunchAtLoginState.unavailable.isRequested, "Unavailable login items must appear off")
+        runner.expect(
+            LaunchAtLoginState.disabled.action(toSetRequested: true) == .register,
+            "Turning on a disabled login item must register it"
+        )
+        runner.expect(
+            LaunchAtLoginState.enabled.action(toSetRequested: false) == .unregister,
+            "Turning off an enabled login item must unregister it"
+        )
+        runner.expect(
+            LaunchAtLoginState.requiresApproval.action(toSetRequested: false) == .unregister,
+            "Turning off an item awaiting approval must unregister it"
+        )
+        runner.expect(
+            LaunchAtLoginState.unavailable.action(toSetRequested: true) == .none,
+            "Unavailable login items must not attempt registration"
+        )
     }
 
     private static func points(

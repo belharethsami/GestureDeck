@@ -11,7 +11,7 @@ private enum SettingsSection: String, CaseIterable, Identifiable {
         switch self {
         case .gestures: "Trackpad Swipes"
         case .shortcuts: "Keyboard Shortcuts"
-        case .about: "About & Status"
+        case .about: "General & About"
         }
     }
 
@@ -19,7 +19,7 @@ private enum SettingsSection: String, CaseIterable, Identifiable {
         switch self {
         case .gestures: "hand.draw"
         case .shortcuts: "keyboard"
-        case .about: "info.circle"
+        case .about: "gearshape"
         }
     }
 }
@@ -58,7 +58,8 @@ struct RootView: View {
                 AboutView(
                     store: controller.store,
                     launcher: controller.launcher,
-                    hotkeyService: controller.hotkeyService
+                    hotkeyService: controller.hotkeyService,
+                    launchAtLoginController: controller.launchAtLoginController
                 )
             }
         }

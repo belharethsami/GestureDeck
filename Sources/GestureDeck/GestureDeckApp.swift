@@ -10,6 +10,9 @@ struct GestureDeckApp: App {
             RootView(controller: controller)
         }
         .defaultSize(width: 900, height: 620)
+        .defaultLaunchBehavior(
+            controller.launchAtLoginController.isRequested ? .suppressed : .presented
+        )
 
         MenuBarExtra {
             MenuBarView(
