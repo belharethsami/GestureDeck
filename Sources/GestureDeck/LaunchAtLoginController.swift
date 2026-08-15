@@ -34,10 +34,6 @@ final class LaunchAtLoginController: ObservableObject {
 
     func setRequested(_ requested: Bool) {
         guard !isUpdating else { return }
-        guard state != .unavailable else {
-            errorMessage = "macOS could not find GestureDeck's login item. Move GestureDeck to Applications and try again."
-            return
-        }
 
         isUpdating = true
         errorMessage = nil
@@ -78,7 +74,7 @@ final class LaunchAtLoginController: ObservableObject {
         case .requiresApproval:
             "GestureDeck is registered, but macOS requires approval in Login Items."
         case .unavailable:
-            "The login item is unavailable. Move GestureDeck to Applications and relaunch it."
+            "GestureDeck is not registered yet. Turn this on to register it with macOS."
         }
     }
 

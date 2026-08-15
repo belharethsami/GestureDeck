@@ -68,6 +68,17 @@ The local script applies an ad-hoc signature. Public distribution should use an
 Apple Developer ID Application certificate and Apple's notarization service.
 Do not disable Gatekeeper, SIP, or device-management controls.
 
+## Install and enable Start at Login
+
+Build the app with `make app`, then drag `dist/GestureDeck.app` into Applications.
+If an older copy is already installed, quit GestureDeck and replace that copy.
+
+Open GestureDeck from Applications, choose **Open GestureDeck…** from its menu-bar
+panel, then open **General & About** and enable **Start GestureDeck at Login**.
+GestureDeck uses Apple's supported Service Management API; if macOS requires
+approval, use the displayed **Open Login Items Settings…** button and allow it
+under **System Settings → General → Login Items & Extensions**.
+
 ## Gesture recognition
 
 GestureDeck calculates the contact centroid and accumulates movement only while
@@ -92,6 +103,15 @@ recognition rules, contact-count transitions, configuration persistence, and
 start-at-login state transitions. Real trackpad hardware must still be exercised
 manually because synthetic input cannot reproduce Apple's private raw-contact
 callback.
+
+The real macOS login-item registration lifecycle can be exercised with:
+
+```sh
+make login-item-integration-test
+```
+
+That test requires GestureDeck 0.2.0 in Applications, verifies the disabled →
+enabled → disabled transition, and restores the original disabled state.
 
 ## License
 

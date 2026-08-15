@@ -82,6 +82,18 @@ final class AppController: ObservableObject {
             hotkeyService.refresh(bindings: [diagnosticShortcut], enabled: true)
         }
 
+        if let loginItemIndex = arguments.firstIndex(of: "--set-launch-at-login"),
+           arguments.indices.contains(loginItemIndex + 1) {
+            switch arguments[loginItemIndex + 1] {
+            case "on":
+                launchAtLoginController.setRequested(true)
+            case "off":
+                launchAtLoginController.setRequested(false)
+            default:
+                break
+            }
+        }
+
         if let launchIndex = arguments.firstIndex(of: "--launch-test"),
            arguments.indices.contains(launchIndex + 1) {
             let path = arguments[launchIndex + 1]
@@ -105,6 +117,7 @@ final class AppController: ObservableObject {
             "lastAction": launcher.lastAction,
             "launchError": launcher.lastError ?? NSNull(),
             "launchAtLogin": launchAtLoginController.state.rawValue,
+            "launchAtLoginError": launchAtLoginController.errorMessage ?? NSNull(),
             "multitouchListening": gestureService.isListening,
             "multitouchStatus": gestureService.status
         ]
@@ -113,8 +126,16 @@ final class AppController: ObservableObject {
             withJSONObject: report,
             options: [.sortedKeys]
         ) {
-            FileHandle.standardOutput.write(data)
-            FileHandle.standardOutput.write(Data("\n".utf8))
+            let output = data + Data("\n".utf8)
+            if let outputIndex = arguments.firstIndex(of: "--diagnostics-output"),
+               arguments.indices.contains(outputIndex + 1) {
+                try? output.write(
+                    to: URL(fileURLWithPath: arguments[outputIndex + 1]),
+                    options: .atomic
+                )
+            } else {
+                FileHandle.standardOutput.write(output)
+            }
         }
 
         NSApplication.shared.terminate(nil)

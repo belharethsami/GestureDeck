@@ -126,8 +126,8 @@ enum GestureDeckLogicTests {
             "Turning off an item awaiting approval must unregister it"
         )
         runner.expect(
-            LaunchAtLoginState.unavailable.action(toSetRequested: true) == .none,
-            "Unavailable login items must not attempt registration"
+            LaunchAtLoginState.unavailable.action(toSetRequested: true) == .register,
+            "Unavailable login items must attempt first-time registration"
         )
     }
 

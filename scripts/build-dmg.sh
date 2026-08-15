@@ -5,7 +5,7 @@ set -euo pipefail
 project_dir="${0:A:h:h}"
 dist_dir="$project_dir/dist"
 app_bundle="$dist_dir/GestureDeck.app"
-dmg_path="$dist_dir/GestureDeck-0.1.0.dmg"
+dmg_path="$dist_dir/GestureDeck-0.2.0.dmg"
 
 "$project_dir/scripts/build-app.sh" >/dev/null
 

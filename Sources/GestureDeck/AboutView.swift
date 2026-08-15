@@ -64,10 +64,7 @@ struct AboutView: View {
                                 }
                             )
                         )
-                        .disabled(
-                            launchAtLoginController.isUpdating
-                                || launchAtLoginController.state == .unavailable
-                        )
+                        .disabled(launchAtLoginController.isUpdating)
                         .accessibilityIdentifier("startAtLoginToggle")
 
                         Text(launchAtLoginController.statusDescription)

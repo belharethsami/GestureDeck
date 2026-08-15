@@ -18,9 +18,11 @@ public enum LaunchAtLoginState: String, Equatable, Sendable {
     }
 
     public func action(toSetRequested requested: Bool) -> LaunchAtLoginAction {
-        guard self != .unavailable else { return .none }
+        if self == .unavailable {
+            return requested ? .register : .none
+        }
 
-        switch (isRequested, requested) {
+        return switch (isRequested, requested) {
         case (false, true):
             .register
         case (true, false):
