@@ -24,7 +24,7 @@ struct AboutView: View {
                             .font(.largeTitle.weight(.bold))
                         Text("Focused gesture and shortcut automation for macOS")
                             .foregroundStyle(.secondary)
-                        Text("Version 0.2.1 · MIT licensed")
+                        Text("Version 0.3.0 · MIT licensed")
                             .font(.caption)
                             .foregroundStyle(.tertiary)
                     }

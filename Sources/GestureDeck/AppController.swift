@@ -142,6 +142,8 @@ final class AppController: ObservableObject {
     }
 
     private func apply(_ configuration: GestureDeckConfiguration) {
+        gestureService.setMinimumDistance(configuration.swipeMinimumDistance)
+
         hotkeyService.refresh(
             bindings: configuration.shortcuts,
             enabled: configuration.isEnabled

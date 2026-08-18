@@ -33,9 +33,16 @@ final class BindingStore: ObservableObject {
     var gestures: [GestureBinding] { configuration.gestures }
     var shortcuts: [ShortcutBinding] { configuration.shortcuts }
     var isEnabled: Bool { configuration.isEnabled }
+    var swipeMinimumDistance: Float { configuration.swipeMinimumDistance }
 
     func setEnabled(_ enabled: Bool) {
         mutate { $0.isEnabled = enabled }
+    }
+
+    func setSwipeMinimumDistance(_ distance: Float) {
+        mutate {
+            $0.swipeMinimumDistance = SwipeRecognitionSettings.clamped(distance)
+        }
     }
 
     @discardableResult

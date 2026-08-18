@@ -11,6 +11,7 @@ branding or code and is not affiliated with its developer.
 
 - 3-, 4-, and 5-finger swipes in four directions
 - Multiple configurable gesture-to-application bindings
+- Adjustable swipe sensitivity with a shorter, macOS-like default
 - User-recorded global keyboard shortcuts
 - Application picker and one-click test launch
 - Local JSON configuration in `UserDefaults`
@@ -95,6 +96,14 @@ recognized if:
 This rejects short movements, ambiguous diagonal motions, and centroid jumps
 caused by adding or removing a finger.
 
+Use the **Swipe distance** slider on the **Trackpad Swipes** page to tune how
+far your fingers must move from 1% to 16% of trackpad travel. The 8% default is
+shorter than the previous 12% threshold and is intended to feel closer to
+macOS's built-in four-finger gestures. Move the slider toward **Short** for less
+travel or toward **Long** to reduce accidental triggers. Very short settings
+can make unintended movements easier to recognize. The selected value is saved
+locally and takes effect immediately.
+
 ## Test
 
 ```sh
@@ -113,7 +122,7 @@ The real macOS login-item registration lifecycle can be exercised with:
 make login-item-integration-test
 ```
 
-That test requires GestureDeck 0.2.1 in Applications, verifies the disabled →
+That test requires GestureDeck 0.3.0 in Applications, verifies the disabled →
 enabled → disabled transition, and restores the original disabled state.
 
 ## License

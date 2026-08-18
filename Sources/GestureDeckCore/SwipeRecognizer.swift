@@ -31,6 +31,16 @@ public struct RecognizedSwipe: Equatable, Sendable {
     }
 }
 
+public enum SwipeRecognitionSettings {
+    public static let minimumAllowedDistance: Float = 0.01
+    public static let maximumAllowedDistance: Float = 0.16
+    public static let defaultMinimumDistance: Float = 0.08
+
+    public static func clamped(_ distance: Float) -> Float {
+        min(maximumAllowedDistance, max(minimumAllowedDistance, distance))
+    }
+}
+
 /// Converts raw contact frames into a single directional swipe.
 ///
 /// Centroid movement is accumulated only while the contact count is stable.
@@ -48,11 +58,11 @@ public struct SwipeRecognizer: Sendable {
     private var accumulatedY: Float = 0
 
     public init(
-        minimumDistance: Float = 0.12,
+        minimumDistance: Float = SwipeRecognitionSettings.defaultMinimumDistance,
         axisDominance: Float = 1.25,
         maximumDuration: TimeInterval = 1.5
     ) {
-        self.minimumDistance = minimumDistance
+        self.minimumDistance = SwipeRecognitionSettings.clamped(minimumDistance)
         self.axisDominance = axisDominance
         self.maximumDuration = maximumDuration
     }

@@ -35,10 +35,13 @@ enum GestureDeckLogicTests {
         let runner = TestRunner()
         testThreeFingerRightSwipe(runner)
         testFiveFingerUpSwipe(runner)
+        testMacLikeShortSwipe(runner)
+        testSwipeSensitivityRange(runner)
         testShortAndDiagonalMovements(runner)
         testFingerCountTransitions(runner)
         testConsecutiveSameDirectionSwipesAfterPartialLift(runner)
         testConfigurationRoundTrip(runner)
+        testLegacyConfigurationSensitivityMigration(runner)
         testLaunchAtLoginStates(runner)
         runner.finish()
     }
@@ -62,6 +65,34 @@ enum GestureDeckLogicTests {
         let result = recognizer.consume(touches: [], timestamp: 10.5)
         runner.expect(result?.fingerCount == 5, "Five-finger swipe should retain its count")
         runner.expect(result?.direction == .up, "Positive y movement should be up")
+    }
+
+    @MainActor
+    private static func testMacLikeShortSwipe(_ runner: TestRunner) {
+        var recognizer = SwipeRecognizer()
+        _ = recognizer.consume(touches: points(count: 4), timestamp: 0)
+        _ = recognizer.consume(touches: points(count: 4, offsetY: 0.09), timestamp: 0.2)
+        let result = recognizer.consume(touches: [], timestamp: 0.3)
+
+        runner.expect(result?.direction == .up, "The default sensitivity should recognize a 9% four-finger swipe")
+    }
+
+    @MainActor
+    private static func testSwipeSensitivityRange(_ runner: TestRunner) {
+        runner.expect(
+            SwipeRecognitionSettings.clamped(0) == 0.01,
+            "The sensitivity slider should allow a 1% minimum"
+        )
+        runner.expect(
+            SwipeRecognitionSettings.clamped(1) == 0.16,
+            "Sensitivity should remain capped at 16%"
+        )
+
+        var recognizer = SwipeRecognizer(minimumDistance: 0.01)
+        _ = recognizer.consume(touches: points(count: 4), timestamp: 0)
+        _ = recognizer.consume(touches: points(count: 4, offsetX: 0.02), timestamp: 0.1)
+        let result = recognizer.consume(touches: [], timestamp: 0.2)
+        runner.expect(result?.direction == .right, "The 1% setting should recognize a 2% swipe")
     }
 
     @MainActor
@@ -115,11 +146,23 @@ enum GestureDeckLogicTests {
         let target = ApplicationTarget(name: "Notes", path: "/System/Applications/Notes.app", bundleIdentifier: "com.apple.Notes")
         let original = GestureDeckConfiguration(
             gestures: [.init(fingerCount: 4, direction: .left, application: target)],
-            shortcuts: [.init(application: target)]
+            shortcuts: [.init(application: target)],
+            swipeMinimumDistance: 0.06
         )
         let encoded = try! JSONEncoder().encode(original)
         let decoded = try! JSONDecoder().decode(GestureDeckConfiguration.self, from: encoded)
         runner.expect(decoded == original, "Configuration must round-trip through JSON")
+    }
+
+    @MainActor
+    private static func testLegacyConfigurationSensitivityMigration(_ runner: TestRunner) {
+        let legacyJSON = Data(#"{"gestures":[],"shortcuts":[],"isEnabled":true}"#.utf8)
+        let decoded = try! JSONDecoder().decode(GestureDeckConfiguration.self, from: legacyJSON)
+
+        runner.expect(
+            decoded.swipeMinimumDistance == SwipeRecognitionSettings.defaultMinimumDistance,
+            "Existing configurations should migrate to the shorter default swipe distance"
+        )
     }
 
     @MainActor

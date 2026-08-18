@@ -91,14 +91,43 @@ public struct GestureDeckConfiguration: Codable, Equatable, Sendable {
     public var gestures: [GestureBinding]
     public var shortcuts: [ShortcutBinding]
     public var isEnabled: Bool
+    public var swipeMinimumDistance: Float
 
     public init(
         gestures: [GestureBinding] = [],
         shortcuts: [ShortcutBinding] = [],
-        isEnabled: Bool = true
+        isEnabled: Bool = true,
+        swipeMinimumDistance: Float = SwipeRecognitionSettings.defaultMinimumDistance
     ) {
         self.gestures = gestures
         self.shortcuts = shortcuts
         self.isEnabled = isEnabled
+        self.swipeMinimumDistance = SwipeRecognitionSettings.clamped(swipeMinimumDistance)
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case gestures
+        case shortcuts
+        case isEnabled
+        case swipeMinimumDistance
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        gestures = try container.decodeIfPresent([GestureBinding].self, forKey: .gestures) ?? []
+        shortcuts = try container.decodeIfPresent([ShortcutBinding].self, forKey: .shortcuts) ?? []
+        isEnabled = try container.decodeIfPresent(Bool.self, forKey: .isEnabled) ?? true
+        swipeMinimumDistance = SwipeRecognitionSettings.clamped(
+            try container.decodeIfPresent(Float.self, forKey: .swipeMinimumDistance)
+                ?? SwipeRecognitionSettings.defaultMinimumDistance
+        )
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(gestures, forKey: .gestures)
+        try container.encode(shortcuts, forKey: .shortcuts)
+        try container.encode(isEnabled, forKey: .isEnabled)
+        try container.encode(swipeMinimumDistance, forKey: .swipeMinimumDistance)
     }
 }

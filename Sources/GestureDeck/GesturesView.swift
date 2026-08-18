@@ -16,6 +16,7 @@ struct GesturesView: View {
             ScrollView {
                 LazyVStack(alignment: .leading, spacing: 12) {
                     informationCard
+                    swipeDistanceCard
                     ListenerStatusCard(
                         status: gestureService.status,
                         isListening: gestureService.isListening,
@@ -90,5 +91,58 @@ struct GesturesView: View {
         .padding(12)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(.quaternary.opacity(0.35), in: RoundedRectangle(cornerRadius: 12))
+    }
+
+    private var swipeDistanceCard: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                Label("Swipe Distance", systemImage: "arrow.left.and.right")
+                    .font(.subheadline.weight(.semibold))
+
+                Spacer()
+
+                Text("\(swipeDistancePercentage)% travel")
+                    .font(.caption.monospacedDigit())
+                    .foregroundStyle(.secondary)
+            }
+
+            HStack(spacing: 10) {
+                Text("Short")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+
+                Slider(
+                    value: Binding(
+                        get: { Double(store.swipeMinimumDistance) },
+                        set: { store.setSwipeMinimumDistance(Float($0)) }
+                    ),
+                    in: swipeDistanceRange,
+                    step: 0.01
+                )
+                .accessibilityLabel("Required swipe distance")
+                .accessibilityValue("\(swipeDistancePercentage) percent")
+
+                Text("Long")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
+            Text("The 8% default is tuned for a shorter, macOS-like multi-finger swipe. Reduce it for lighter movement or increase it to avoid accidental triggers.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(14)
+        .background(.quaternary.opacity(0.35), in: RoundedRectangle(cornerRadius: 12))
+    }
+
+    private var swipeDistanceRange: ClosedRange<Double> {
+        let lowerBound = Double(SwipeRecognitionSettings.minimumAllowedDistance)
+        let upperBound = Double(SwipeRecognitionSettings.maximumAllowedDistance)
+        return lowerBound...upperBound
+    }
+
+    private var swipeDistancePercentage: Int {
+        Int((store.swipeMinimumDistance * 100).rounded())
     }
 }

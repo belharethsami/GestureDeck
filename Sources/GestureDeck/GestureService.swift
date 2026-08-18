@@ -15,6 +15,10 @@ final class GestureService: ObservableObject {
     private var streamTask: Task<Void, Never>?
     private var recognizer = SwipeRecognizer()
 
+    func setMinimumDistance(_ distance: Float) {
+        recognizer.minimumDistance = SwipeRecognitionSettings.clamped(distance)
+    }
+
     func start() {
         guard streamTask == nil else { return }
 
