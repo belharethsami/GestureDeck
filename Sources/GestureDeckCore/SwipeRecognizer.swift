@@ -64,16 +64,18 @@ public struct SwipeRecognizer: Sendable {
         let activeTouches = touches
         let count = activeTouches.count
 
-        if count == 0 {
+        // A physical swipe is over as soon as fewer than three supported
+        // contacts remain. Waiting for every raw contact record to disappear
+        // can merge consecutive swipes because the trackpad reports fingers
+        // asynchronously while they lift.
+        if count < 3 {
             return finish(at: timestamp)
         }
 
-        guard (3...5).contains(count) else {
-            if startedAt != nil {
-                maximumFingerCount = max(maximumFingerCount, count)
-            }
-            lastCentroid = centroid(of: activeTouches)
-            lastCount = count
+        guard count <= 5 else {
+            // More than five contacts cannot match a GestureDeck binding.
+            // Reject the session instead of firing a lower-count gesture.
+            reset()
             return nil
         }
 

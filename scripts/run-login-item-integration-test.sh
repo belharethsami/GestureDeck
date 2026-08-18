@@ -15,15 +15,15 @@ if [[ "$app_bundle" != "/Applications/GestureDeck.app" ]]; then
 fi
 
 if [[ ! -x "$executable" ]]; then
-    print -u2 "Install GestureDeck 0.2.0 in Applications before running this test."
+    print -u2 "Install GestureDeck 0.2.1 in Applications before running this test."
     exit 1
 fi
 
 installed_version=$(/usr/libexec/PlistBuddy \
     -c 'Print :CFBundleShortVersionString' \
     "$app_bundle/Contents/Info.plist")
-if [[ "$installed_version" != "0.2.0" ]]; then
-    print -u2 "Expected GestureDeck 0.2.0 in Applications, found $installed_version."
+if [[ "$installed_version" != "0.2.1" ]]; then
+    print -u2 "Expected GestureDeck 0.2.1 in Applications, found $installed_version."
     exit 1
 fi
 

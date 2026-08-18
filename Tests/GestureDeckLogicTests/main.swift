@@ -37,6 +37,7 @@ enum GestureDeckLogicTests {
         testFiveFingerUpSwipe(runner)
         testShortAndDiagonalMovements(runner)
         testFingerCountTransitions(runner)
+        testConsecutiveSameDirectionSwipesAfterPartialLift(runner)
         testConfigurationRoundTrip(runner)
         testLaunchAtLoginStates(runner)
         runner.finish()
@@ -85,6 +86,28 @@ enum GestureDeckLogicTests {
         let result = recognizer.consume(touches: [], timestamp: 0.4)
         runner.expect(result?.fingerCount == 4, "Maximum stable finger count should select the binding")
         runner.expect(result?.direction == .right, "Movement after adding a finger should still recognize")
+    }
+
+    @MainActor
+    private static func testConsecutiveSameDirectionSwipesAfterPartialLift(_ runner: TestRunner) {
+        var recognizer = SwipeRecognizer()
+
+        _ = recognizer.consume(touches: points(count: 3), timestamp: 0)
+        _ = recognizer.consume(touches: points(count: 3, offsetX: 0.18), timestamp: 0.2)
+        let first = recognizer.consume(
+            touches: points(count: 2, offsetX: 0.18),
+            timestamp: 0.3
+        )
+
+        _ = recognizer.consume(touches: points(count: 3), timestamp: 0.4)
+        _ = recognizer.consume(touches: points(count: 3, offsetX: 0.18), timestamp: 0.6)
+        let second = recognizer.consume(
+            touches: points(count: 2, offsetX: 0.18),
+            timestamp: 0.7
+        )
+
+        runner.expect(first?.direction == .right, "A swipe should complete when fewer than three contacts remain")
+        runner.expect(second?.direction == .right, "A same-direction swipe should rearm after the preceding lift")
     }
 
     @MainActor

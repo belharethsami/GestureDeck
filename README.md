@@ -82,7 +82,10 @@ under **System Settings → General → Login Items & Extensions**.
 ## Gesture recognition
 
 GestureDeck calculates the contact centroid and accumulates movement only while
-the finger count is stable. It recognizes a gesture when all contacts lift if:
+the physical contact count is stable. It completes and rearms a gesture as soon
+as fewer than three fingers remain in contact, without treating the trackpad's
+hovering or post-lift contact records as part of the next swipe. A swipe is
+recognized if:
 
 - the maximum contact count is exactly 3, 4, or 5;
 - travel exceeds the configured internal threshold;
@@ -110,7 +113,7 @@ The real macOS login-item registration lifecycle can be exercised with:
 make login-item-integration-test
 ```
 
-That test requires GestureDeck 0.2.0 in Applications, verifies the disabled →
+That test requires GestureDeck 0.2.1 in Applications, verifies the disabled →
 enabled → disabled transition, and restores the original disabled state.
 
 ## License

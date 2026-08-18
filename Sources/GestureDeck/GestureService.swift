@@ -49,10 +49,10 @@ final class GestureService: ObservableObject {
     private func consume(_ frame: [OMSTouchData]) {
         let active = frame.filter { touch in
             switch touch.state {
-            case .notTouching, .leaving:
-                false
-            case .starting, .hovering, .making, .touching, .breaking, .lingering:
+            case .making, .touching, .breaking:
                 true
+            case .notTouching, .starting, .hovering, .lingering, .leaving:
+                false
             }
         }
 
